@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,13 +16,16 @@ class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
 
   @override
-  void onChange(BlocBase bloc, Change change) {
+  void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
     super.onChange(bloc, change);
     if (bloc is Cubit) print(change);
   }
 
   @override
-  void onTransition(Bloc bloc, Transition transition) {
+  void onTransition(
+    Bloc<dynamic, dynamic> bloc,
+    Transition<dynamic, dynamic> transition,
+  ) {
     super.onTransition(bloc, transition);
     print(transition);
   }
@@ -164,19 +169,9 @@ class ThemeCubit extends Cubit<ThemeData> {
   /// {@macro brightness_cubit}
   ThemeCubit() : super(_lightTheme);
 
-  static final _lightTheme = ThemeData(
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      foregroundColor: Colors.white,
-    ),
-    brightness: Brightness.light,
-  );
+  static final _lightTheme = ThemeData.light();
 
-  static final _darkTheme = ThemeData(
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      foregroundColor: Colors.black,
-    ),
-    brightness: Brightness.dark,
-  );
+  static final _darkTheme = ThemeData.dark();
 
   /// Toggles the current brightness between light and dark.
   void toggleTheme() {

@@ -3,10 +3,10 @@ import 'package:flutter_weather/weather/weather.dart';
 
 class WeatherPopulated extends StatelessWidget {
   const WeatherPopulated({
-    super.key,
     required this.weather,
     required this.units,
     required this.onRefresh,
+    super.key,
   });
 
   final Weather weather;
@@ -90,7 +90,7 @@ extension on WeatherCondition {
 class _WeatherBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).primaryColor;
+    final color = Theme.of(context).colorScheme.primaryContainer;
     return SizedBox.expand(
       child: DecoratedBox(
         decoration: BoxDecoration(

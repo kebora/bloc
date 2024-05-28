@@ -8,11 +8,12 @@ class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(title: const Text('Cart')),
-      body: ColoredBox(
+      body: const ColoredBox(
         color: Colors.yellow,
         child: Column(
-          children: const [
+          children: [
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(32),
@@ -20,7 +21,7 @@ class CartPage extends StatelessWidget {
               ),
             ),
             Divider(height: 4, color: Colors.black),
-            CartTotal()
+            CartTotal(),
           ],
         ),
       ),
@@ -37,32 +38,30 @@ class CartList extends StatelessWidget {
 
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
-        if (state is CartLoading) {
-          return const CircularProgressIndicator();
-        }
-        if (state is CartLoaded) {
-          return ListView.separated(
-            itemCount: state.cart.items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 4),
-            itemBuilder: (context, index) {
-              final item = state.cart.items[index];
-              return Material(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: ListTile(
-                  leading: const Icon(Icons.done),
-                  title: Text(item.name, style: itemNameStyle),
-                  onLongPress: () {
-                    context.read<CartBloc>().add(CartItemRemoved(item));
-                  },
-                ),
-              );
-            },
-          );
-        }
-        return const Text('Something went wrong!');
+        return switch (state) {
+          CartLoading() => const CircularProgressIndicator(),
+          CartError() => const Text('Something went wrong!'),
+          CartLoaded() => ListView.separated(
+              itemCount: state.cart.items.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 4),
+              itemBuilder: (context, index) {
+                final item = state.cart.items[index];
+                return Material(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: ListTile(
+                    leading: const Icon(Icons.done),
+                    title: Text(item.name, style: itemNameStyle),
+                    onLongPress: () {
+                      context.read<CartBloc>().add(CartItemRemoved(item));
+                    },
+                  ),
+                );
+              },
+            ),
+        };
       },
     );
   }
@@ -84,13 +83,12 @@ class CartTotal extends StatelessWidget {
           children: [
             BlocBuilder<CartBloc, CartState>(
               builder: (context, state) {
-                if (state is CartLoading) {
-                  return const CircularProgressIndicator();
-                }
-                if (state is CartLoaded) {
-                  return Text('\$${state.cart.totalPrice}', style: hugeStyle);
-                }
-                return const Text('Something went wrong!');
+                return switch (state) {
+                  CartLoading() => const CircularProgressIndicator(),
+                  CartError() => const Text('Something went wrong!'),
+                  CartLoaded() =>
+                    Text('\$${state.cart.totalPrice}', style: hugeStyle),
+                };
               },
             ),
             const SizedBox(width: 24),
@@ -100,7 +98,6 @@ class CartTotal extends StatelessWidget {
                   const SnackBar(content: Text('Buying not supported yet.')),
                 );
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
               child: const Text('BUY'),
             ),
           ],

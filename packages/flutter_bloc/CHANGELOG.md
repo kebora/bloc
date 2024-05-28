@@ -1,3 +1,24 @@
+# 8.1.5
+
+- feat: override `debugFillProperties` ([#4082](https://github.com/felangel/bloc/pull/4082))
+- docs: add missing comma to `BlocListener` API docs ([#4106](https://github.com/felangel/bloc/pull/4106))
+- chore: update copyright year
+- chore: update sponsors
+
+# 8.1.4
+
+- chore: update sponsors ([#4054](https://github.com/felangel/bloc/pull/4054))
+- chore: adjust `example` themes
+- chore: fix `require_trailing_commas` ([#3977](https://github.com/felangel/bloc/pull/3977))
+- chore: add `topics` to `pubspec.yaml` ([#3914](https://github.com/felangel/bloc/pull/3914))
+
+# 8.1.3
+
+- docs: remove graphql sample references from README ([#3820](https://github.com/felangel/bloc/pull/3820))
+- docs: upgrade to Dart 3 ([#3809](https://github.com/felangel/bloc/pull/3820))
+- refactor: standardize analysis_options ([#3809](https://github.com/felangel/bloc/pull/3820))
+- refactor: update sdk constraints and fix analysis warnings ([#3809](https://github.com/felangel/bloc/pull/3820))
+
 # 8.1.2
 
 - chore: add screenshots to `pubspec.yaml` ([#3717](https://github.com/felangel/bloc/pull/3717))

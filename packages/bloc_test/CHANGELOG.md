@@ -1,3 +1,30 @@
+# 9.1.7
+
+- chore: update copyright year
+- chore: update sponsors
+
+# 9.1.6
+
+- chore: update sponsors ([#4054](https://github.com/felangel/bloc/pull/4054))
+
+# 9.1.5
+
+- fix: `blocTest` supports `async` `expect` ([#3976](https://github.com/felangel/bloc/pull/3976))
+
+# 9.1.4
+
+- deps: support `mocktail: ^1.0.0` ([#3917](https://github.com/felangel/bloc/pull/3917))
+- chore: add topics to `pubspec.yaml` ([#3914](https://github.com/felangel/bloc/pull/3914))
+
+# 9.1.3
+
+- fix: test timeouts due to uncaught exceptions which occur with `package:test ^1.22.2` ([#3854](https://github.com/felangel/bloc/pull/3854))
+
+# 9.1.2
+
+- docs: upgrade to Dart 3
+- refactor: standardize analysis_options
+
 # 9.1.1
 
 - chore: upgrade to `bloc ^8.1.1` ([#3723](https://github.com/felangel/bloc/pull/3723))

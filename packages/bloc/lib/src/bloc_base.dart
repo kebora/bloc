@@ -29,6 +29,7 @@ abstract class Closable {
 }
 
 /// An object that can emit new states.
+// ignore: one_member_abstracts
 abstract class Emittable<State extends Object?> {
   /// Emits a new [state].
   void emit(State state);
@@ -56,8 +57,7 @@ abstract class BlocBase<State>
     _blocObserver.onCreate(this);
   }
 
-  // ignore: deprecated_member_use_from_same_package
-  final _blocObserver = BlocOverrides.current?.blocObserver ?? Bloc.observer;
+  final _blocObserver = Bloc.observer;
 
   late final _stateController = StreamController<State>.broadcast();
 

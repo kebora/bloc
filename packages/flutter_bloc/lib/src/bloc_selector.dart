@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,9 +28,9 @@ typedef BlocWidgetSelector<S, T> = T Function(S state);
 class BlocSelector<B extends StateStreamable<S>, S, T> extends StatefulWidget {
   /// {@macro bloc_selector}
   const BlocSelector({
-    Key? key,
     required this.selector,
     required this.builder,
+    Key? key,
     this.bloc,
   }) : super(key: key);
 
@@ -52,6 +53,20 @@ class BlocSelector<B extends StateStreamable<S>, S, T> extends StatefulWidget {
 
   @override
   State<BlocSelector<B, S, T>> createState() => _BlocSelectorState<B, S, T>();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<B?>('bloc', bloc))
+      ..add(ObjectFlagProperty<BlocWidgetBuilder<T>>.has('builder', builder))
+      ..add(
+        ObjectFlagProperty<BlocWidgetSelector<S, T>>.has(
+          'selector',
+          selector,
+        ),
+      );
+  }
 }
 
 class _BlocSelectorState<B extends StateStreamable<S>, S, T>

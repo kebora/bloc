@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_catching_errors
+
 import 'dart:async';
 
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -117,6 +119,14 @@ mixin HydratedMixin<State> on BlocBase<State> {
   void hydrate() {
     final storage = HydratedBloc.storage;
     try {
+      final stateJson = storage.read(storageToken) as Map<dynamic, dynamic>?;
+      _state = stateJson != null ? _fromJson(stateJson) : super.state;
+    } catch (error, stackTrace) {
+      onError(error, stackTrace);
+      _state = super.state;
+    }
+
+    try {
       final stateJson = _toJson(state);
       if (stateJson != null) {
         storage.write(storageToken, stateJson).then((_) {}, onError: onError);
@@ -130,28 +140,7 @@ mixin HydratedMixin<State> on BlocBase<State> {
   State? _state;
 
   @override
-  State get state {
-    final storage = HydratedBloc.storage;
-    if (_state != null) return _state!;
-    try {
-      final stateJson = storage.read(storageToken) as Map<dynamic, dynamic>?;
-      if (stateJson == null) {
-        _state = super.state;
-        return super.state;
-      }
-      final cachedState = _fromJson(stateJson);
-      if (cachedState == null) {
-        _state = super.state;
-        return super.state;
-      }
-      _state = cachedState;
-      return cachedState;
-    } catch (error, stackTrace) {
-      onError(error, stackTrace);
-      _state = super.state;
-      return super.state;
-    }
-  }
+  State get state => _state ?? super.state;
 
   @override
   void onChange(Change<State> change) {
@@ -278,9 +267,10 @@ mixin HydratedMixin<State> on BlocBase<State> {
         : _traverseComplexJson(object);
   }
 
+  // ignore: avoid_dynamic_calls
   dynamic _toEncodable(dynamic object) => object.toJson();
 
-  final List _seen = <dynamic>[];
+  final _seen = <dynamic>[];
 
   void _checkCycle(Object? object) {
     for (var i = 0; i < _seen.length; i++) {
@@ -292,8 +282,8 @@ mixin HydratedMixin<State> on BlocBase<State> {
   }
 
   void _removeSeen(dynamic object) {
-    assert(_seen.isNotEmpty);
-    assert(identical(_seen.last, object));
+    assert(_seen.isNotEmpty, 'seen must not be empty');
+    assert(identical(_seen.last, object), 'last seen object must be identical');
     _seen.removeLast();
   }
 

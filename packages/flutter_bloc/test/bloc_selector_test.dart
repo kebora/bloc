@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,7 +19,7 @@ void main() {
         MaterialApp(
           home: BlocSelector<CounterCubit, int, bool>(
             bloc: counterCubit,
-            selector: (state) => state % 2 == 0,
+            selector: (state) => state.isEven,
             builder: (context, state) {
               builderCallCount++;
               return Text('isEven: $state');
@@ -79,7 +80,7 @@ void main() {
           home: BlocProvider.value(
             value: counterCubit,
             child: BlocSelector<CounterCubit, int, bool>(
-              selector: (state) => state % 2 == 0,
+              selector: (state) => state.isEven,
               builder: (context, state) {
                 builderCallCount++;
                 return Text('isEven: $state');
@@ -103,7 +104,7 @@ void main() {
           child: BlocProvider.value(
             value: firstCounterCubit,
             child: BlocSelector<CounterCubit, int, bool>(
-              selector: (state) => state % 2 == 0,
+              selector: (state) => state.isEven,
               builder: (context, state) => Text('isEven: $state'),
             ),
           ),
@@ -123,7 +124,7 @@ void main() {
           child: BlocProvider.value(
             value: secondCounterCubit,
             child: BlocSelector<CounterCubit, int, bool>(
-              selector: (state) => state % 2 == 0,
+              selector: (state) => state.isEven,
               builder: (context, state) => Text('isEven: $state'),
             ),
           ),
@@ -149,7 +150,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: BlocSelector<CounterCubit, int, bool>(
             bloc: firstCounterCubit,
-            selector: (state) => state % 2 == 0,
+            selector: (state) => state.isEven,
             builder: (context, state) => Text('isEven: $state'),
           ),
         ),
@@ -167,7 +168,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: BlocSelector<CounterCubit, int, bool>(
             bloc: secondCounterCubit,
-            selector: (state) => state % 2 == 0,
+            selector: (state) => state.isEven,
             builder: (context, state) => Text('isEven: $state'),
           ),
         ),
@@ -181,6 +182,30 @@ void main() {
 
       expect(find.text('isEven: false'), findsOneWidget);
       expect(find.text('isEven: true'), findsNothing);
+    });
+
+    testWidgets('overrides debugFillProperties', (tester) async {
+      final builder = DiagnosticPropertiesBuilder();
+
+      BlocSelector(
+        bloc: CounterCubit(),
+        builder: (context, state) => const SizedBox(),
+        selector: (state) => state,
+      ).debugFillProperties(builder);
+
+      final description = builder.properties
+          .where((node) => !node.isFiltered(DiagnosticLevel.info))
+          .map((node) => node.toString())
+          .toList();
+
+      expect(
+        description,
+        <String>[
+          "bloc: Instance of 'CounterCubit'",
+          'has builder',
+          'has selector',
+        ],
+      );
     });
   });
 }

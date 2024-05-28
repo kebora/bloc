@@ -11,8 +11,6 @@ class MockRepository extends Mock implements Repository {}
 class MockComplexListCubit extends MockCubit<ComplexListState>
     implements ComplexListCubit {}
 
-class FakeComplexListState extends Fake implements ComplexListState {}
-
 extension on WidgetTester {
   Future<void> pumpListPage(Repository repository) {
     return pumpWidget(
@@ -43,12 +41,9 @@ void main() {
     Item(id: '2', value: 'Item 2'),
     Item(id: '3', value: 'Item 3'),
   ];
+
   late Repository repository;
   late ComplexListCubit listCubit;
-
-  setUpAll(() {
-    registerFallbackValue(FakeComplexListState());
-  });
 
   setUp(() {
     repository = MockRepository();
@@ -90,13 +85,13 @@ void main() {
       expect(find.byType(ComplexListView), findsOneWidget);
     });
     testWidgets(
-        'renders no content text when '
+        'renders "No Content" text when '
         'no items are present', (tester) async {
       when(() => listCubit.state).thenReturn(
         const ComplexListState.success([]),
       );
       await tester.pumpListView(listCubit);
-      expect(find.text('no content'), findsOneWidget);
+      expect(find.text('No Content'), findsOneWidget);
     });
 
     testWidgets('renders three ItemTiles', (tester) async {
@@ -119,13 +114,12 @@ void main() {
   });
 
   group('ItemTile', () {
-    testWidgets('renders id and value text', (tester) async {
+    testWidgets('renders value text', (tester) async {
       const mockItem = Item(id: '1', value: 'Item 1');
       when(() => listCubit.state).thenReturn(
         const ComplexListState.success([mockItem]),
       );
       await tester.pumpListView(listCubit);
-      expect(find.text('#1'), findsOneWidget);
       expect(find.text('Item 1'), findsOneWidget);
     });
 

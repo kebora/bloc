@@ -1,3 +1,22 @@
+# 8.1.4
+
+- docs: improve diagrams
+- chore: update copyright year
+- chore: update sponsors
+
+# 8.1.3
+
+- chore: update sponsors ([#4054](https://github.com/felangel/bloc/pull/4054))
+- chore: fix `require_trailing_commas` ([#3977](https://github.com/felangel/bloc/pull/3977))
+- chore(deps): upgrade to `package:mocktail v1.0.0` ([#3919](https://github.com/felangel/bloc/pull/3919))
+- chore: add `topics` to `pubspec.yaml` ([#3914](https://github.com/felangel/bloc/pull/3914))
+
+# 8.1.2
+
+- docs: upgrade README snippets to Dart 3 ([#3826](https://github.com/felangel/bloc/pull/3826))
+- refactor: standardize analysis options and resolve warnings ([#3826](https://github.com/felangel/bloc/pull/3826))
+- docs: remove superfluous word from inline docs ([#3734](https://github.com/felangel/bloc/pull/3734))
+
 # 8.1.1
 
 - chore: add screenshots to `pubspec.yaml` ([#3708](https://github.com/felangel/bloc/pull/3708))

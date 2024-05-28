@@ -1,3 +1,30 @@
+# 9.1.5
+
+- chore: update copyright year
+- chore: update sponsors
+
+# 9.1.4
+
+- chore: update sponsors ([#4054](https://github.com/felangel/bloc/pull/4054))
+
+# 9.1.3
+
+- fix: `fromJson` can safely access `state` ([#4005](https://github.com/felangel/bloc/pull/4005))
+- chore: add `platforms` to `pubspec.yaml` ([#3993](https://github.com/felangel/bloc/pull/3993))
+- chore: upgrade to `package:mocktail` v1.0.0 ([#3919](https://github.com/felangel/bloc/pull/3919))
+- chore: add `topics` to `pubspec.yaml` ([#3914](https://github.com/felangel/bloc/pull/3914))
+
+# 9.1.2
+
+- fix: clear HydratedStorage instance on close ([#3879](https://github.com/felangel/bloc/pull/3879))
+
+# 9.1.1
+
+- docs: upgrade to Dart 3 ([#3809](https://github.com/felangel/bloc/pull/3809))
+- refactor: standardize analysis_options ([#3809](https://github.com/felangel/bloc/pull/3809))
+- refactor: fix `unawaited` sdk constraint ([#3809](https://github.com/felangel/bloc/pull/3809))
+- refactor: update sdk constraints and fix analysis warnings ([#3809](https://github.com/felangel/bloc/pull/3809))
+
 # 9.1.0
 
 - chore: add screenshots to `pubspec.yaml` ([#3721](https://github.com/felangel/bloc/pull/3721))

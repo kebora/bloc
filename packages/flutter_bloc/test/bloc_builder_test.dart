@@ -1,41 +1,42 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class MyThemeApp extends StatefulWidget {
-  MyThemeApp({
-    Key? key,
+  const MyThemeApp({
     required Cubit<ThemeData> themeCubit,
-    required Function onBuild,
+    required void Function() onBuild,
+    Key? key,
   })  : _themeCubit = themeCubit,
         _onBuild = onBuild,
         super(key: key);
 
   final Cubit<ThemeData> _themeCubit;
-  final Function _onBuild;
+  final void Function() _onBuild;
 
   @override
-  State<MyThemeApp> createState() => MyThemeAppState(
-        themeCubit: _themeCubit,
-        onBuild: _onBuild,
-      );
+  State<MyThemeApp> createState() => MyThemeAppState();
 }
 
 class MyThemeAppState extends State<MyThemeApp> {
-  MyThemeAppState({
-    required Cubit<ThemeData> themeCubit,
-    required Function onBuild,
-  })  : _themeCubit = themeCubit,
-        _onBuild = onBuild;
+  MyThemeAppState();
 
-  Cubit<ThemeData> _themeCubit;
-  final Function _onBuild;
+  @override
+  void initState() {
+    super.initState();
+    _themeCubit = widget._themeCubit;
+    _onBuild = widget._onBuild;
+  }
+
+  late Cubit<ThemeData> _themeCubit;
+  late final void Function() _onBuild;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<Cubit<ThemeData>, ThemeData>(
       bloc: _themeCubit,
-      builder: ((context, theme) {
+      builder: (context, theme) {
         _onBuild();
         return MaterialApp(
           key: const Key('material_app'),
@@ -53,13 +54,14 @@ class MyThemeAppState extends State<MyThemeApp> {
                 key: const Key('raised_button_2'),
                 child: const SizedBox(),
                 onPressed: () {
+                  // ignore: no_self_assignments
                   setState(() => _themeCubit = _themeCubit);
                 },
               ),
             ],
           ),
         );
-      }),
+      },
     );
   }
 }
@@ -74,11 +76,12 @@ class ThemeCubit extends Cubit<ThemeData> {
 class DarkThemeCubit extends Cubit<ThemeData> {
   DarkThemeCubit() : super(ThemeData.dark());
 
-  void setDarkTheme() => emit(ThemeData.dark());
   void setLightTheme() => emit(ThemeData.light());
 }
 
 class MyCounterApp extends StatefulWidget {
+  const MyCounterApp({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => MyCounterAppState();
 }
@@ -116,9 +119,9 @@ class MyCounterAppState extends State<MyCounterApp> {
             ),
             ElevatedButton(
               key: const Key('myCounterAppIncrementButton'),
-              child: const SizedBox(),
               onPressed: _cubit.increment,
-            )
+              child: const SizedBox(),
+            ),
           ],
         ),
       ),
@@ -130,7 +133,6 @@ class CounterCubit extends Cubit<int> {
   CounterCubit({int seed = 0}) : super(seed);
 
   void increment() => emit(state + 1);
-  void decrement() => emit(state - 1);
 }
 
 void main() {
@@ -349,7 +351,7 @@ void main() {
 
     testWidgets('with buildWhen only rebuilds when buildWhen evaluates to true',
         (tester) async {
-      await tester.pumpWidget(MyCounterApp());
+      await tester.pumpWidget(const MyCounterApp());
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('myCounterApp')), findsOneWidget);
@@ -410,7 +412,7 @@ void main() {
         BlocBuilder<CounterCubit, int>(
           bloc: counterCubit,
           buildWhen: (previous, state) {
-            if (state % 2 == 0) {
+            if (state.isEven) {
               buildWhenPreviousState.add(previous);
               buildWhenCurrentState.add(state);
               return true;
@@ -447,7 +449,7 @@ void main() {
           child: StatefulBuilder(
             builder: (context, setState) => BlocBuilder<CounterCubit, int>(
               bloc: counterCubit,
-              buildWhen: (previous, state) => state % 2 == 0,
+              buildWhen: (previous, state) => state.isEven,
               builder: (_, state) {
                 states.add(state);
                 return ElevatedButton(
@@ -515,6 +517,30 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Count 101'), findsOneWidget);
+    });
+
+    testWidgets('overrides debugFillProperties', (tester) async {
+      final builder = DiagnosticPropertiesBuilder();
+
+      BlocBuilder(
+        bloc: CounterCubit(),
+        builder: (context, state) => const SizedBox(),
+        buildWhen: (previous, current) => previous != current,
+      ).debugFillProperties(builder);
+
+      final description = builder.properties
+          .where((node) => !node.isFiltered(DiagnosticLevel.info))
+          .map((node) => node.toString())
+          .toList();
+
+      expect(
+        description,
+        <String>[
+          'has buildWhen',
+          "bloc: Instance of 'CounterCubit'",
+          'has builder',
+        ],
+      );
     });
   });
 }

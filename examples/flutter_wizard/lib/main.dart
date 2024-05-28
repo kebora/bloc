@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
                 final profile = await Navigator.of(context).push(
                   ProfileWizard.route(),
                 );
-                if (!mounted) return;
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(SnackBar(content: Text('$profile')));
@@ -65,10 +65,7 @@ class ProfileWizard extends StatelessWidget {
 }
 
 class ProfileWizardFlow extends StatelessWidget {
-  const ProfileWizardFlow({
-    super.key,
-    required this.onComplete,
-  });
+  const ProfileWizardFlow({required this.onComplete, super.key});
 
   final ValueSetter<Profile> onComplete;
 
@@ -109,24 +106,27 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
     return Scaffold(
       appBar: AppBar(title: const Text('Name')),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            TextField(
-              onChanged: (value) => setState(() => _name = value),
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                hintText: 'John Doe',
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: <Widget>[
+              TextField(
+                onChanged: (value) => setState(() => _name = value),
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'John Doe',
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: _name.isNotEmpty
-                  ? () => context
-                      .read<ProfileWizardBloc>()
-                      .add(ProfileWizardNameSubmitted(_name))
-                  : null,
-              child: const Text('Continue'),
-            )
-          ],
+              ElevatedButton(
+                onPressed: _name.isNotEmpty
+                    ? () => context
+                        .read<ProfileWizardBloc>()
+                        .add(ProfileWizardNameSubmitted(_name))
+                    : null,
+                child: const Text('Continue'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -150,25 +150,28 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
     return Scaffold(
       appBar: AppBar(title: const Text('Age')),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            TextField(
-              onChanged: (value) => setState(() => _age = int.parse(value)),
-              decoration: const InputDecoration(
-                labelText: 'Age',
-                hintText: '42',
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: <Widget>[
+              TextField(
+                onChanged: (value) => setState(() => _age = int.parse(value)),
+                decoration: const InputDecoration(
+                  labelText: 'Age',
+                  hintText: '42',
+                ),
+                keyboardType: TextInputType.number,
               ),
-              keyboardType: TextInputType.number,
-            ),
-            ElevatedButton(
-              onPressed: _age != null
-                  ? () => context
-                      .read<ProfileWizardBloc>()
-                      .add(ProfileWizardAgeSubmitted(_age))
-                  : null,
-              child: const Text('Continue'),
-            )
-          ],
+              ElevatedButton(
+                onPressed: _age != null
+                    ? () => context
+                        .read<ProfileWizardBloc>()
+                        .add(ProfileWizardAgeSubmitted(_age))
+                    : null,
+                child: const Text('Continue'),
+              ),
+            ],
+          ),
         ),
       ),
     );

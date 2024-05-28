@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherApp extends StatelessWidget {
-  const WeatherApp({super.key, required WeatherRepository weatherRepository})
+  const WeatherApp({required WeatherRepository weatherRepository, super.key})
       : _weatherRepository = weatherRepository;
 
   final WeatherRepository _weatherRepository;
@@ -28,18 +28,16 @@ class WeatherAppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return BlocBuilder<ThemeCubit, Color>(
       builder: (context, color) {
         return MaterialApp(
           theme: ThemeData(
-            primaryColor: color,
-            textTheme: GoogleFonts.rajdhaniTextTheme(),
-            appBarTheme: AppBarTheme(
-              titleTextStyle: GoogleFonts.rajdhaniTextTheme(textTheme)
-                  .apply(bodyColor: Colors.white)
-                  .titleLarge,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
             ),
+            colorScheme: ColorScheme.fromSeed(seedColor: color),
+            textTheme: GoogleFonts.rajdhaniTextTheme(),
           ),
           home: const WeatherPage(),
         );

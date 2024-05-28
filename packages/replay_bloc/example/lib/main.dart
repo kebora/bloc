@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:replay_bloc/replay_bloc.dart';
@@ -15,13 +17,16 @@ class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
 
   @override
-  void onChange(BlocBase bloc, Change change) {
+  void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
     super.onChange(bloc, change);
     if (bloc is Cubit) print(change);
   }
 
   @override
-  void onTransition(Bloc bloc, Transition transition) {
+  void onTransition(
+    Bloc<dynamic, dynamic> bloc,
+    Transition<dynamic, dynamic> transition,
+  ) {
     super.onTransition(bloc, transition);
     print(transition);
   }
@@ -120,42 +125,23 @@ class CounterPage extends StatelessWidget {
   }
 }
 
-/// {@template replay_counter_cubit}
-/// A simple [ReplayCubit] which manages an `int` as its state
-/// and exposes three public methods to `increment`, `decrement`, and
-/// `reset` the value of the state.
-/// {@endtemplate}
-class CounterCubit extends ReplayCubit<int> {
-  /// {@macro replay_counter_cubit}
-  CounterCubit() : super(0);
-
-  /// Increments the [CounterCubit] state by 1.
-  void increment() => emit(state + 1);
-
-  /// Decrements the [CounterCubit] state by 1.
-  void decrement() => emit(state - 1);
-
-  /// Resets the [CounterCubit] state to 0.
-  void reset() => emit(0);
-}
-
 /// Base event class for the [CounterBloc].
-class CounterEvent extends ReplayEvent {}
+sealed class CounterEvent extends ReplayEvent {}
 
 /// Notifies [CounterBloc] to increment its state.
-class CounterIncrementPressed extends CounterEvent {
+final class CounterIncrementPressed extends CounterEvent {
   @override
   String toString() => 'CounterIncrementPressed';
 }
 
 /// Notifies [CounterBloc] to decrement its state.
-class CounterDecrementPressed extends CounterEvent {
+final class CounterDecrementPressed extends CounterEvent {
   @override
   String toString() => 'CounterDecrementPressed';
 }
 
 /// Notifies [CounterBloc] to reset its state.
-class CounterResetPressed extends CounterEvent {
+final class CounterResetPressed extends CounterEvent {
   @override
   String toString() => 'CounterResetPressed';
 }

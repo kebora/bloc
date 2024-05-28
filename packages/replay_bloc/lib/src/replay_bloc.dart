@@ -4,7 +4,7 @@ part of 'replay_cubit.dart';
 /// Base event class for all [ReplayBloc] events.
 /// {@endtemplate}
 abstract class ReplayEvent {
-  /// {@template replay_event}
+  /// {@macro replay_event}
   const ReplayEvent();
 }
 
@@ -71,11 +71,9 @@ abstract class ReplayBloc<Event extends ReplayEvent, State>
 /// A mixin which enables `undo` and `redo` operations
 /// for [Bloc] classes.
 mixin ReplayBlocMixin<Event extends ReplayEvent, State> on Bloc<Event, State> {
-  // ignore: deprecated_member_use
-  late final _blocObserver = BlocOverrides.current?.blocObserver;
   late final _changeStack = _ChangeStack<State>(shouldReplay: shouldReplay);
 
-  BlocObserver get _observer => _blocObserver ?? Bloc.observer;
+  BlocObserver get _observer => Bloc.observer;
 
   /// Sets the internal `undo`/`redo` size limit.
   /// By default there is no limit.
@@ -97,32 +95,38 @@ mixin ReplayBlocMixin<Event extends ReplayEvent, State> on Bloc<Event, State> {
 
   @override
   void emit(State state) {
-    _changeStack.add(_Change<State>(
-      this.state,
-      state,
-      () {
-        final event = _Redo();
-        onEvent(event);
-        onTransition(Transition(
-          currentState: this.state,
-          event: event,
-          nextState: state,
-        ));
-        // ignore: invalid_use_of_visible_for_testing_member
-        super.emit(state);
-      },
-      (val) {
-        final event = _Undo();
-        onEvent(event);
-        onTransition(Transition(
-          currentState: this.state,
-          event: event,
-          nextState: val,
-        ));
-        // ignore: invalid_use_of_visible_for_testing_member
-        super.emit(val);
-      },
-    ));
+    _changeStack.add(
+      _Change<State>(
+        this.state,
+        state,
+        () {
+          final event = _Redo();
+          onEvent(event);
+          onTransition(
+            Transition(
+              currentState: this.state,
+              event: event,
+              nextState: state,
+            ),
+          );
+          // ignore: invalid_use_of_visible_for_testing_member
+          super.emit(state);
+        },
+        (val) {
+          final event = _Undo();
+          onEvent(event);
+          onTransition(
+            Transition(
+              currentState: this.state,
+              event: event,
+              nextState: val,
+            ),
+          );
+          // ignore: invalid_use_of_visible_for_testing_member
+          super.emit(val);
+        },
+      ),
+    );
     // ignore: invalid_use_of_visible_for_testing_member
     super.emit(state);
   }

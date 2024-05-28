@@ -138,14 +138,14 @@ import 'package:test/test.dart' as test;
 @isTest
 void blocTest<B extends BlocBase<State>, State>(
   String description, {
-  FutureOr<void> Function()? setUp,
   required B Function() build,
+  FutureOr<void> Function()? setUp,
   State Function()? seed,
-  Function(B bloc)? act,
+  dynamic Function(B bloc)? act,
   Duration? wait,
   int skip = 0,
   dynamic Function()? expect,
-  Function(B bloc)? verify,
+  dynamic Function(B bloc)? verify,
   dynamic Function()? errors,
   FutureOr<void> Function()? tearDown,
   dynamic tags,
@@ -174,30 +174,28 @@ void blocTest<B extends BlocBase<State>, State>(
 /// This should never be used directly -- please use [blocTest] instead.
 @visibleForTesting
 Future<void> testBloc<B extends BlocBase<State>, State>({
-  FutureOr<void> Function()? setUp,
   required B Function() build,
+  FutureOr<void> Function()? setUp,
   State Function()? seed,
-  Function(B bloc)? act,
+  dynamic Function(B bloc)? act,
   Duration? wait,
   int skip = 0,
   dynamic Function()? expect,
-  Function(B bloc)? verify,
+  dynamic Function(B bloc)? verify,
   dynamic Function()? errors,
   FutureOr<void> Function()? tearDown,
 }) async {
   var shallowEquality = false;
   final unhandledErrors = <Object>[];
-  final localBlocObserver =
-      // ignore: deprecated_member_use
-      BlocOverrides.current?.blocObserver ?? Bloc.observer;
+  final localBlocObserver = Bloc.observer;
   final testObserver = _TestBlocObserver(
     localBlocObserver,
     unhandledErrors.add,
   );
   Bloc.observer = testObserver;
 
-  await runZonedGuarded(
-    () async {
+  try {
+    await _runZonedGuarded(() async {
       await setUp?.call();
       final states = <State>[];
       final bloc = build();
@@ -214,7 +212,7 @@ Future<void> testBloc<B extends BlocBase<State>, State>({
       await Future<void>.delayed(Duration.zero);
       await bloc.close();
       if (expect != null) {
-        final dynamic expected = expect();
+        final dynamic expected = await expect();
         shallowEquality = '$states' == '$expected';
         try {
           test.expect(states, test.wrapMatcher(expected));
@@ -229,23 +227,34 @@ Future<void> testBloc<B extends BlocBase<State>, State>({
       await subscription.cancel();
       await verify?.call(bloc);
       await tearDown?.call();
-    },
-    (Object error, _) {
-      if (shallowEquality && error is test.TestFailure) {
-        // ignore: only_throw_errors
-        throw test.TestFailure(
-          '''${error.message}
+    });
+  } catch (error) {
+    if (shallowEquality && error is test.TestFailure) {
+      // ignore: only_throw_errors
+      throw test.TestFailure(
+        '''
+${error.message}
 WARNING: Please ensure state instances extend Equatable, override == and hashCode, or implement Comparable.
 Alternatively, consider using Matchers in the expect of the blocTest rather than concrete state instances.\n''',
-        );
-      }
-      if (errors == null || !unhandledErrors.contains(error)) {
-        // ignore: only_throw_errors
-        throw error;
-      }
-    },
-  );
+      );
+    }
+    if (errors == null || !unhandledErrors.contains(error)) {
+      rethrow;
+    }
+  }
+
   if (errors != null) test.expect(unhandledErrors, test.wrapMatcher(errors()));
+}
+
+Future<void> _runZonedGuarded(Future<void> Function() body) {
+  final completer = Completer<void>();
+  runZonedGuarded(() async {
+    await body();
+    if (!completer.isCompleted) completer.complete();
+  }, (error, stackTrace) {
+    if (!completer.isCompleted) completer.completeError(error, stackTrace);
+  });
+  return completer.future;
 }
 
 class _TestBlocObserver extends BlocObserver {
@@ -255,7 +264,7 @@ class _TestBlocObserver extends BlocObserver {
   final void Function(Object error) _onError;
 
   @override
-  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+  void onError(BlocBase<dynamic> bloc, Object error, StackTrace stackTrace) {
     _localObserver.onError(bloc, error, stackTrace);
     _onError(error);
     super.onError(bloc, error, stackTrace);
@@ -267,9 +276,9 @@ String _diff({required dynamic expected, required dynamic actual}) {
   final differences = diff(expected.toString(), actual.toString());
   buffer
     ..writeln('${"=" * 4} diff ${"=" * 40}')
-    ..writeln('')
+    ..writeln()
     ..writeln(differences.toPrettyString())
-    ..writeln('')
+    ..writeln()
     ..writeln('${"=" * 4} end diff ${"=" * 36}');
   return buffer.toString();
 }

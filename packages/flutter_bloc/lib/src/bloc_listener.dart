@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/single_child_widget.dart';
@@ -68,7 +69,7 @@ typedef BlocListenerCondition<S> = bool Function(S previous, S current);
 ///   },
 ///   listener: (context, state) {
 ///     // do stuff here based on BlocA's state
-///   }
+///   },
 ///   child: Container(),
 /// )
 /// ```
@@ -78,8 +79,8 @@ class BlocListener<B extends StateStreamable<S>, S>
   /// {@macro bloc_listener}
   /// {@macro bloc_listener_listen_when}
   const BlocListener({
-    Key? key,
     required BlocWidgetListener<S> listener,
+    Key? key,
     B? bloc,
     BlocListenerCondition<S>? listenWhen,
     Widget? child,
@@ -103,8 +104,8 @@ abstract class BlocListenerBase<B extends StateStreamable<S>, S>
     extends SingleChildStatefulWidget {
   /// {@macro bloc_listener_base}
   const BlocListenerBase({
-    Key? key,
     required this.listener,
+    Key? key,
     this.bloc,
     this.child,
     this.listenWhen,
@@ -129,6 +130,20 @@ abstract class BlocListenerBase<B extends StateStreamable<S>, S>
   @override
   SingleChildState<BlocListenerBase<B, S>> createState() =>
       _BlocListenerBaseState<B, S>();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<B?>('bloc', bloc))
+      ..add(ObjectFlagProperty<BlocWidgetListener<S>>.has('listener', listener))
+      ..add(
+        ObjectFlagProperty<BlocListenerCondition<S>?>.has(
+          'listenWhen',
+          listenWhen,
+        ),
+      );
+  }
 }
 
 class _BlocListenerBaseState<B extends StateStreamable<S>, S>

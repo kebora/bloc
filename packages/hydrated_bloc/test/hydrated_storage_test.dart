@@ -28,13 +28,15 @@ void main() {
 
     group('migration', () {
       test('returns correct value when file exists', () async {
-        File('${storageDirectory.path}/.hydrated_bloc.json')
-          ..writeAsStringSync(json.encode({
-            'CounterBloc': json.encode({'value': 4})
-          }));
+        File('${storageDirectory.path}/.hydrated_bloc.json').writeAsStringSync(
+          json.encode({
+            'CounterBloc': json.encode({'value': 4}),
+          }),
+        );
         storage = await HydratedStorage.build(
           storageDirectory: storageDirectory,
         );
+        // ignore: avoid_dynamic_calls
         expect(storage.read('CounterBloc')['value'] as int, 4);
       });
     });
@@ -58,16 +60,30 @@ void main() {
         expect(instanceA, instanceB);
       });
 
+      test('creates new instance if storage was closed', () async {
+        final instanceA = await HydratedStorage.build(
+          storageDirectory: storageDirectory,
+        );
+        await instanceA.close();
+        final instanceB = storage = await HydratedStorage.build(
+          storageDirectory: storageDirectory,
+        );
+        expect(instanceA, isNot(instanceB));
+      });
+
       test(
           'does not call Hive.init '
           'when storageDirectory is webStorageDirectory', () async {
         final completer = Completer<void>();
-        await runZonedGuarded(() {
-          HydratedStorage.build(
-            storageDirectory: HydratedStorage.webStorageDirectory,
-          ).whenComplete(completer.complete);
-          return completer.future;
-        }, (Object _, StackTrace __) {});
+        await runZonedGuarded(
+          () {
+            HydratedStorage.build(
+              storageDirectory: HydratedStorage.webStorageDirectory,
+            ).whenComplete(completer.complete);
+            return completer.future;
+          },
+          (Object _, StackTrace __) {},
+        );
         expect(HiveImpl().homePath, isNull);
         storage = await HydratedStorage.build(
           storageDirectory: storageDirectory,
@@ -87,7 +103,7 @@ void main() {
     group('default constructor', () {
       const key = '__key__';
       const value = '__value__';
-      late Box box;
+      late Box<dynamic> box;
 
       setUp(() {
         box = MockBox();
@@ -173,7 +189,8 @@ void main() {
             (i) => Iterable.generate(i, (j) => 'Point($i,$j);').toList(),
           ).toList();
 
-          unawaited(storage.write(token, record));
+          // ignore: unawaited_futures
+          storage.write(token, record);
 
           storage = await HydratedStorage.build(
             storageDirectory: Directory(cwd),

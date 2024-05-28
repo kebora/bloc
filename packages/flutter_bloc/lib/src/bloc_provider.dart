@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -34,8 +35,8 @@ class BlocProvider<T extends StateStreamableSource<Object?>>
     extends SingleChildStatelessWidget {
   /// {@macro bloc_provider}
   const BlocProvider({
-    Key? key,
     required Create<T> create,
+    Key? key,
     this.child,
     this.lazy = true,
   })  : _create = create,
@@ -60,8 +61,8 @@ class BlocProvider<T extends StateStreamableSource<Object?>>
   /// );
   /// ```
   const BlocProvider.value({
-    Key? key,
     required T value,
+    Key? key,
     this.child,
   })  : _value = value,
         _create = null,
@@ -127,18 +128,24 @@ class BlocProvider<T extends StateStreamableSource<Object?>>
             create: _create,
             dispose: (_, bloc) => bloc.close(),
             startListening: _startListening,
-            child: child,
             lazy: lazy,
+            child: child,
           );
   }
 
   static VoidCallback _startListening(
-    InheritedContext<StateStreamable?> e,
-    StateStreamable value,
+    InheritedContext<StateStreamable<dynamic>?> e,
+    StateStreamable<dynamic> value,
   ) {
     final subscription = value.stream.listen(
       (dynamic _) => e.markNeedsNotifyDependents(),
     );
     return subscription.cancel;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<bool>('lazy', lazy));
   }
 }
